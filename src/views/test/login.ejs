@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Login</title>
+  </head>
+  <body>
+    <h1>Sign in</h1>
+    <form id="loginForm" action="/auth/v1/login" method="post">
+      <section>
+        <label for="username">Username</label>
+        <input
+          id="username"
+          name="username"
+          type="text"
+          autocomplete="username"
+          required
+          autofocus
+        />
+      </section>
+      <section>
+        <label for="current-password">Password</label>
+        <input
+          id="current-password"
+          name="password"
+          type="password"
+          autocomplete="current-password"
+          required
+        />
+      </section>
+      <button type="submit">Sign in</button>
+    </form>
+
+    <script>
+      const form = document.getElementById("loginForm");
+
+      form.addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        const username = form.querySelector("#username").value;
+        const password = form.querySelector("#current-password").value;
+
+        fetch("/auth/v1/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            username: username,
+            password: password,
+          }),
+        })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("Network response was not ok");
+            }
+            // Check content type to decide how to parse response
+            const contentType = response.headers.get("content-type");
+            if (contentType && contentType.includes("application/json")) {
+              return response.json();
+            } else {
+              throw new Error("Expected JSON response from server");
+            }
+          })
+          .then((data) => {
+            console.log("Login successful:", data);
+            // Redirect or update UI on successful login
+          })
+          .catch((error) => {
+            console.error("Error during login:", error);
+            // Handle errors, potentially update UI to display error message
+          });
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <title>Document</title>
+  </head>
+  <body>
+    <h1>Hello from view</h1>
+    <button onclick="checkAndRedirect()">
+      Kiểm tra Cookie và Chuyển Trang
+    </button>
+
+    <script>
+      function checkAndRedirect() {
+        const accessToken = getCookie("jwt");
+        if (!accessToken) {
+          window.location.href = "/login";
+        } else {
+          testCookie(accessToken);
+        }
+      }
+
+      function getCookie(name) {
+        const cookies = document.cookie.split(";");
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          if (cookie.startsWith(name + "=")) {
+            return cookie.substring(name.length + 1, cookie.length);
+          }
+        }
+        return null;
+      }
+
+      function testCookie() {
+        fetch("/testCookie", {
+          method: "GET",
+          credentials: "include", // Bao gồm cookie trong yêu cầu
+        })
+          .then((response) => {
+            if (response.ok) {
+              window.location.href = "/testCookie";
+            } else if (response.status === 401) {
+              window.location.href = "/loginpage";
+            } else {
+              console.log("Có lỗi xảy ra:", response.status);
+            }
+          })
+          .catch((error) => {
+            console.error("Lỗi:", error);
+          });
+      }
+    </script>
+  </body>
+</html>
